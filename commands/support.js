@@ -19,7 +19,7 @@ module.exports = {
           iconURL: "https://cdn.discordapp.com/attachments/1284914027289641143/1318913893677924352/support_logo.png?ex=67640dc8&is=6762bc48&hm=9f161c8f9ab7f2a20b542d1ec3fbc480575ddefd9d876611e2b203eb1e04f9a4&",
         })
         .setDescription(
-          `**<:links:1316812623685226518> Helpful Links :**\n` +
+          `**<:links:1316812623685226518> __Helpful Links__ :**\n` +
           `<:discord:1317043530933211166> - [Support Server](${supportServerLink})\n` +
           `<:github:1318917991131385887> - [GitHub](${githubLink})\n` +
           `<:gunslol:1318913278826516532> - [Guns LOL](${gunslolLink})\n` +
