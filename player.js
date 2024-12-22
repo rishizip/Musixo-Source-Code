@@ -46,36 +46,35 @@ function initializePlayer(client) {
         const requester = requesters.get(trackUri);
 
         try {
-            // Music card creation
             const musicard = await Dynamic({
                 thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-                backgroundColor: '#121212',  // Keep a consistent background color
+                backgroundColor: '#070707',
                 progress: 10,
-                progressColor: '#ffcc00',  // Consistent progress color
-                progressBarColor: '#dbd8d3', // Bot color for progress bar
+                progressColor: '#FF7A00',
+                progressBarColor: '#5F2D00',
                 name: track.info.title,
-                nameColor: '#dbd8d3', // Bot color for track name
+                nameColor: '#FF7A00',
                 author: track.info.author || 'Unknown Artist',
-                authorColor: '#a1a1a1', // Consistent author color
+                authorColor: '#696969',
             });
 
             const cardPath = path.join(__dirname, 'musicard.png');
             fs.writeFileSync(cardPath, musicard);
 
             const attachment = new AttachmentBuilder(cardPath, { name: 'musicard.png' });
-
             const embed = new EmbedBuilder()
                 .setAuthor({
                     name: 'Now Playing',
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
-                .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
-                .setColor('#dbd8d3') // Consistent bot color for embed
-                .setDescription('') // No description, just the image
-                .setFooter({
-                    text: `Requested by ${requester.username}`,
-                    iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
-                });
+                .setDescription(`
+🎶 **Controls:**
+<:synclogo:1320415646370103376> \`Loop\` ╎ <:disablelogo:1320412997218205696> \`Disable\` ╎ <:skiplogo:1320414333523591178> \`Skip\` ╎ <:queuelogo:1320413053187002428> \`Queue\` ╎ <:clearlogo:1320413125626953729> \`Clear\`
+<:stoplogo:1320413021876654194> \`Stop\` ╎ <:pauselogo:1320412748575670294> \`Pause\` ╎ <:playlogo:1320412974644727880> \`Resume\` ╎ <:volpluslogo:1320413395727417375> \`Vol +\` ╎ <:volminuslogo:1320413413330915349> \`Vol -\`
+`)
+
+                .setImage('attachment://musicard.png')
+                .setColor('#FF7A00');
 
             const actionRow1 = createActionRow1(false);
             const actionRow2 = createActionRow2(false);
@@ -92,8 +91,6 @@ function initializePlayer(client) {
 
         } catch (error) {
             console.error("Error creating or sending music card:", error.message);
-
-            // Send an error embed to the channel
             const errorEmbed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setDescription("⚠️ **Unable to load track card. Continuing playback...**");
@@ -259,24 +256,24 @@ function showQueue(channel) {
     const queueChunks = [];
 
     for (let i = 1; i < queueNames.length; i += 10) {
-        const chunk = queueNames.slice(i, i + 10).map(formatTrack).join("\n");
+        const chunk = queueNames.slice(i, i + 10)
+            .map((song, index) => `${i + index}. ${formatTrack(song)}`)
+            .join('\n');
         queueChunks.push(chunk);
     }
 
-    const embed = new EmbedBuilder()
-        .setColor(config.embedColor)
-        .setTitle("Queue:")
-        .setDescription(nowPlaying + "\n" + queueChunks.join("\n"))
-        .setFooter({ text: `Requested by ${requesters.get(queueNames[0].uri)?.username}` });
+    channel.send({
+        embeds: [new EmbedBuilder().setColor(config.embedColor).setDescription(nowPlaying)]
+    }).catch(console.error);
 
-    channel.send({ embeds: [embed] });
+    queueChunks.forEach(async (chunk) => {
+        const embed = new EmbedBuilder()
+            .setColor(config.embedColor)
+            .setDescription(`📜 **Queue:**\n${chunk}`);
+        await channel.send({ embeds: [embed] }).catch(console.error);
+    });
 }
 
-function formatTrack(track) {
-    return `${track.info.title} by ${track.info.author}`;
-}
-
-// Define the action row creation functions
 function createActionRow1(disabled) {
     return new ActionRowBuilder()
         .addComponents(
@@ -297,6 +294,16 @@ function createActionRow2(disabled) {
             new ButtonBuilder().setCustomId("volumeUp").setEmoji('<:volpluslogo:1320413395727417375>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
             new ButtonBuilder().setCustomId("volumeDown").setEmoji('<:volminuslogo:1320413413330915349>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
         );
+}
+
+function formatTrack(track) {
+    if (!track || typeof track !== 'string') return track;
+    const match = track.match(/\[(.*?) - (.*?)\]\((.*?)\)/);
+    if (match) {
+        const [, title, author, uri] = match;
+        return `[${title} - ${author}](${uri})`;
+    }
+    return track;
 }
 
 module.exports = { initializePlayer };
