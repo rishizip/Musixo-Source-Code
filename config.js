@@ -19,10 +19,10 @@ module.exports = {
   
     nodes: [
       {
-          name: "Naig Node - 01",
-          host: "lavalink01.techbyte.host",
-          port: 1164,
-          password: "NAIGLAVA-dash.techbyte.host",
+          name: "INZEWORLD.COM (DE)",
+          host: "lava.inzeworld.com",
+          port: 3128,
+          password: "saher.inzeworld.com",
           reconnectTimeout: 2036,
           reconnectTries: Infinity,
           secure: false
