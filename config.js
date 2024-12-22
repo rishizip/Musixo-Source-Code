@@ -19,11 +19,11 @@ module.exports = {
   
     nodes: [
       {
-          name: "Koi Node V3",
-          host: "lavav3.prplmoe.me",
+          name: "Naig Node - 01",
+          host: "lavalink01.techbyte.host",
           port: 1164,
-          password: "prplmoe.me",
-          reconnectTimeout: 5000,
+          password: "NAIGLAVA-dash.techbyte.host",
+          reconnectTimeout: 2036,
           reconnectTries: Infinity,
           secure: false
       },

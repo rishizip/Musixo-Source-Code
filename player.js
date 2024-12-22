@@ -7,32 +7,75 @@ const fs = require("fs");
 const path = require("path");
 
 function initializePlayer(client) {
-    const nodes = createNodes(client);
-    client.riffy = new Riffy(client, nodes, getRiffyOptions(client));
+    const nodes = config.nodes.map(node => ({
+        name: node.name,
+        host: node.host,
+        port: node.port,
+        password: node.password,
+        secure: node.secure,
+        reconnectTimeout: 5000,
+        reconnectTries: Infinity
+    }));
+
+    client.riffy = new Riffy(client, nodes, {
+        send: (payload) => {
+            const guildId = payload.d.guild_id;
+            if (!guildId) return;
+
+            const guild = client.guilds.cache.get(guildId);
+            if (guild) guild.shard.send(payload);
+        },
+        defaultSearchPlatform: "ytmsearch",
+        restVersion: "v4",
+    });
 
     let currentTrackMessageId = null;
     let collector = null;
 
-    // Event Handlers
-    client.riffy.on("nodeConnect", handleNodeConnect);
-    client.riffy.on("nodeError", handleNodeError);
-    client.riffy.on("trackStart", (player, track) => handleTrackStart(client, player, track, currentTrackMessageId));
-    client.riffy.on("trackEnd", (player) => handleTrackEnd(player));
-    client.riffy.on("playerDisconnect", (player) => handlePlayerDisconnect(player));
-    client.riffy.on("queueEnd", (player) => handleQueueEnd(client, player, currentTrackMessageId));
+    client.riffy.on("nodeConnect", node => {
+        console.log(`Node "${node.name}" connected.`);
+    });
 
-    async function handleTrackStart(client, player, track, currentTrackMessageId) {
+    client.riffy.on("nodeError", (node, error) => {
+        console.error(`Node "${node.name}" encountered an error: ${error.message}.`);
+    });
+
+    client.riffy.on("trackStart", async (player, track) => {
         const channel = client.channels.cache.get(player.textChannel);
         const trackUri = track.info.uri;
         const requester = requesters.get(trackUri);
 
         try {
-            const musicCard = await generateMusicCard(track);
+            // Music card creation
+            const musicard = await Dynamic({
+                thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
+                backgroundColor: '#121212',  // Keep a consistent background color
+                progress: 10,
+                progressColor: '#ffcc00',  // Consistent progress color
+                progressBarColor: '#dbd8d3', // Bot color for progress bar
+                name: track.info.title,
+                nameColor: '#dbd8d3', // Bot color for track name
+                author: track.info.author || 'Unknown Artist',
+                authorColor: '#a1a1a1', // Consistent author color
+            });
+
             const cardPath = path.join(__dirname, 'musicard.png');
-            fs.writeFileSync(cardPath, musicCard);
+            fs.writeFileSync(cardPath, musicard);
 
             const attachment = new AttachmentBuilder(cardPath, { name: 'musicard.png' });
-            const embed = createTrackEmbed(track, requester);
+
+            const embed = new EmbedBuilder()
+                .setAuthor({
+                    name: 'Now Playing',
+                    iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
+                })
+                .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
+                .setColor('#dbd8d3') // Consistent bot color for embed
+                .setDescription('') // No description, just the image
+                .setFooter({
+                    text: `Requested by ${requester.username}`,
+                    iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
+                });
 
             const actionRow1 = createActionRow1(false);
             const actionRow2 = createActionRow2(false);
@@ -46,22 +89,29 @@ function initializePlayer(client) {
 
             if (collector) collector.stop();
             collector = setupCollector(client, player, channel, message);
+
         } catch (error) {
-            await handleError(channel, error);
+            console.error("Error creating or sending music card:", error.message);
+
+            // Send an error embed to the channel
+            const errorEmbed = new EmbedBuilder()
+                .setColor('#FF0000')
+                .setDescription("⚠️ **Unable to load track card. Continuing playback...**");
+            await channel.send({ embeds: [errorEmbed] });
         }
-    }
+    });
 
-    async function handleTrackEnd(player) {
+    client.riffy.on("trackEnd", async (player) => {
         await disableTrackMessage(client, player);
         currentTrackMessageId = null;
-    }
+    });
 
-    async function handlePlayerDisconnect(player) {
+    client.riffy.on("playerDisconnect", async (player) => {
         await disableTrackMessage(client, player);
         currentTrackMessageId = null;
-    }
+    });
 
-    async function handleQueueEnd(client, player, currentTrackMessageId) {
+    client.riffy.on("queueEnd", async (player) => {
         const channel = client.channels.cache.get(player.textChannel);
         if (channel && currentTrackMessageId) {
             const queueEmbed = new EmbedBuilder()
@@ -71,96 +121,36 @@ function initializePlayer(client) {
         }
         player.destroy();
         currentTrackMessageId = null;
-    }
-}
-
-function createNodes(client) {
-    return config.nodes.map(node => ({
-        name: node.name,
-        host: node.host,
-        port: node.port,
-        password: node.password,
-        secure: node.secure,
-        reconnectTimeout: 5000,
-        reconnectTries: Infinity
-    }));
-}
-
-function getRiffyOptions(client) {
-    return {
-        send: (payload) => {
-            const guildId = payload.d.guild_id;
-            if (!guildId) return;
-
-            const guild = client.guilds.cache.get(guildId);
-            if (guild) guild.shard.send(payload);
-        },
-        defaultSearchPlatform: "ytmsearch",
-        restVersion: "v4",
-    };
-}
-
-async function generateMusicCard(track) {
-    const musicard = await Dynamic({
-        thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-        backgroundColor: '#121212',
-        progress: 10,
-        progressColor: '#ffcc00',
-        progressBarColor: '#dbd8d3',
-        name: track.info.title,
-        nameColor: '#dbd8d3',
-        author: track.info.author || 'Unknown Artist',
-        authorColor: '#a1a1a1',
     });
-    return musicard;
-}
 
-function createTrackEmbed(track, requester) {
-    return new EmbedBuilder()
-        .setAuthor({
-            name: 'Now Playing',
-            iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
-        })
-        .setImage('https://cdn.discordapp.com/attachments/1284095258044534859/1320461296562475008/player_banner.png?ex=6769aeea&is=67685d6a&hm=f4664ad2100dea741b2f5b73f5238acc1d997492e1da8939c18da6c4dd2fbebb&')
-        .setColor('#dbd8d3')
-        .setDescription('')
-        .setFooter({
-            text: `Requested by ${requester.username}`,
-            iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
-        });
-}
+    async function disableTrackMessage(client, player) {
+        const channel = client.channels.cache.get(player.textChannel);
+        if (!channel || !currentTrackMessageId) return;
 
-async function handleError(channel, error) {
-    console.error("Error creating or sending music card:", error.message);
-    const errorEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
-        .setDescription("⚠️ **Unable to load track card. Continuing playback...**");
-    await channel.send({ embeds: [errorEmbed] });
-}
-
-async function disableTrackMessage(client, player) {
-    const channel = client.channels.cache.get(player.textChannel);
-    if (!channel || !currentTrackMessageId) return;
-
-    try {
-        const message = await channel.messages.fetch(currentTrackMessageId);
-        if (message) {
-            const disabledRow1 = createActionRow1(true);
-            const disabledRow2 = createActionRow2(true);
-            await message.edit({ components: [disabledRow1, disabledRow2] });
+        try {
+            const message = await channel.messages.fetch(currentTrackMessageId);
+            if (message) {
+                const disabledRow1 = createActionRow1(true);
+                const disabledRow2 = createActionRow2(true);
+                await message.edit({ components: [disabledRow1, disabledRow2] });
+            }
+        } catch (error) {
+            console.error("Failed to disable message components:", error);
         }
-    } catch (error) {
-        console.error("Failed to disable message components:", error);
     }
 }
 
-// Event Filter and Collector
 function setupCollector(client, player, channel, message) {
-    const filter = i => ['loopToggle', 'skipTrack', 'disableLoop', 'showQueue', 'clearQueue', 'stopTrack', 'pauseTrack', 'resumeTrack', 'volumeUp', 'volumeDown'].includes(i.customId);
+    const filter = i => [
+        'loopToggle', 'skipTrack', 'disableLoop', 'showQueue', 'clearQueue',
+        'stopTrack', 'pauseTrack', 'resumeTrack', 'volumeUp', 'volumeDown'
+    ].includes(i.customId);
+
     const collector = message.createMessageComponentCollector({ filter, time: 600000 });
 
     collector.on('collect', async i => {
         await i.deferUpdate();
+
         const member = i.member;
         const voiceChannel = member.voice.channel;
         const playerChannel = player.voiceChannel;
@@ -177,11 +167,13 @@ function setupCollector(client, player, channel, message) {
         handleInteraction(i, player, channel);
     });
 
-    collector.on('end', () => console.log("Collector stopped."));
+    collector.on('end', () => {
+        console.log("Collector stopped.");
+    });
+
     return collector;
 }
 
-// Action Handlers
 async function handleInteraction(i, player, channel) {
     switch (i.customId) {
         case 'loopToggle':
@@ -207,10 +199,20 @@ async function handleInteraction(i, player, channel) {
             await sendEmbed(channel, '⏹️ **Playback has been stopped and player destroyed!**');
             break;
         case 'pauseTrack':
-            handlePause(player, channel);
+            if (player.paused) {
+                await sendEmbed(channel, '⏸️ **Playback is already paused!**');
+            } else {
+                player.pause(true);
+                await sendEmbed(channel, '⏸️ **Playback has been paused!**');
+            }
             break;
         case 'resumeTrack':
-            handleResume(player, channel);
+            if (!player.paused) {
+                await sendEmbed(channel, '▶️ **Playback is already resumed!**');
+            } else {
+                player.pause(false);
+                await sendEmbed(channel, '▶️ **Playback has been resumed!**');
+            }
             break;
         case 'volumeUp':
             adjustVolume(player, channel, 10);
