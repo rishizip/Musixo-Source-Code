@@ -46,18 +46,23 @@ function initializePlayer(client) {
         const requester = requesters.get(trackUri);
 
         try {
+            // Log start of music card creation
+            console.log("Generating music card for track:", track.info.title);
+
             // Music card creation
             const musicard = await Dynamic({
                 thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-                backgroundColor: '#121212',  // Keep a consistent background color
+                backgroundColor: '#121212',
                 progress: 10,
-                progressColor: '#ffcc00',  // Consistent progress color
-                progressBarColor: '#dbd8d3', // Bot color for progress bar
+                progressColor: '#ffcc00',
+                progressBarColor: '#dbd8d3',
                 name: track.info.title,
-                nameColor: '#dbd8d3', // Bot color for track name
+                nameColor: '#dbd8d3',
                 author: track.info.author || 'Unknown Artist',
-                authorColor: '#a1a1a1', // Consistent author color
+                authorColor: '#a1a1a1',
             });
+
+            console.log("Music card generated successfully");
 
             const cardPath = path.join(__dirname, 'musicard.png');
             fs.writeFileSync(cardPath, musicard);
@@ -70,8 +75,8 @@ function initializePlayer(client) {
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
                 .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
-                .setColor('#dbd8d3') // Consistent bot color for embed
-                .setDescription('') // No description, just the image
+                .setColor('#dbd8d3')
+                .setDescription('')
                 .setFooter({
                     text: `Requested by ${requester.username}`,
                     iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
