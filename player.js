@@ -69,8 +69,8 @@ function initializePlayer(client) {
                 })
                 .setDescription(`
 🎶 **Controls:**
-<:synclogo:1320415646370103376> \`Loop\` ╎ <:disablelogo:1320412997218205696> \`Disable\` ╎ <:skiplogo:1320414333523591178> \`Skip\` ╎ <:queuelogo:1320413053187002428> \`Queue\` ╎ <:clearlogo:1320413125626953729> \`Clear\`
-<:stoplogo:1320413021876654194> \`Stop\` ╎ <:pauselogo:1320412748575670294> \`Pause\` ╎ <:playlogo:1320412974644727880> \`Resume\` ╎ <:volpluslogo:1320413395727417375> \`Vol +\` ╎ <:volminuslogo:1320413413330915349> \`Vol -\`
+<:synclogo:1320500087084028055> \`Loop\` ╎ <:disablelogo:1320500104137936980> \`Disable\` ╎ <:skiplogo:1320500281578094703> \`Skip\` ╎ <:queuelogo:1320500144952709130> \`Queue\` ╎ <:clearlogo:1320500163047067760> \`Clear\`
+<:stoplogo:1320500126170480732> \`Stop\` ╎ <:pauselogo:1320500055102455848> \`Pause\` ╎ <:playlogo:1320500071908773898> \`Resume\` ╎ <:volpluslogo:1320500195951247360> \`Vol +\` ╎ <:volminuslogo:1320500256407949312> \`Vol -\`
 `)
 
                 .setImage('attachment://musicard.png')
@@ -277,33 +277,23 @@ function showQueue(channel) {
 function createActionRow1(disabled) {
     return new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder().setCustomId("loopToggle").setEmoji('<:synclogo:1320415646370103376>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("disableLoop").setEmoji('<:disablelogo:1320412997218205696>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("skipTrack").setEmoji('<:skiplogo:1320414333523591178>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("showQueue").setEmoji('<:queuelogo:1320413053187002428>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("clearQueue").setEmoji('<:clearlogo:1320413125626953729>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
+            new ButtonBuilder().setCustomId("loopToggle").setEmoji('<:synclogo:1320500087084028055>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("disableLoop").setEmoji('<:disablelogo:1320500104137936980>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("skipTrack").setEmoji('<:skiplogo:1320500281578094703>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("showQueue").setEmoji('<:queuelogo:1320500144952709130>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("clearQueue").setEmoji('<:clearlogo:1320500163047067760>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
         );
 }
 
 function createActionRow2(disabled) {
     return new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder().setCustomId("stopTrack").setEmoji('<:stoplogo:1320413021876654194>').setStyle(ButtonStyle.Danger).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("pauseTrack").setEmoji('<:pauselogo:1320412748575670294>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("resumeTrack").setEmoji('<:playlogo:1320412974644727880>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("volumeUp").setEmoji('<:volpluslogo:1320413395727417375>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("volumeDown").setEmoji('<:volminuslogo:1320413413330915349>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
+            new ButtonBuilder().setCustomId("stopTrack").setEmoji('<:stoplogo:1320500126170480732>').setStyle(ButtonStyle.Danger).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("pauseTrack").setEmoji('<:pauselogo:1320500055102455848>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("resumeTrack").setEmoji('<:playlogo:1320500071908773898>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("volumeUp").setEmoji('<:volpluslogo:1320500195951247360>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("volumeDown").setEmoji('<:volminuslogo:1320500256407949312>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
         );
 }
 
-function formatTrack(track) {
-    if (!track || typeof track !== 'string') return track;
-    const match = track.match(/\[(.*?) - (.*?)\]\((.*?)\)/);
-    if (match) {
-        const [, title, author, uri] = match;
-        return `[${title} - ${author}](${uri})`;
-    }
-    return track;
-}
-
-module.exports = { initializePlayer };
+module.exports = initializePlayer;
