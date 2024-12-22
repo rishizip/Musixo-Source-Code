@@ -46,18 +46,18 @@ function initializePlayer(client) {
         const requester = requesters.get(trackUri);
 
         try {
-            const musicard = await Dynamic({
-                thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-                backgroundColor: '#070707',
-                progress: 10,
-                progressColor: '#FF7A00',
-                progressBarColor: '#5F2D00',
-                name: track.info.title,
-                nameColor: '#dbd8d3', // Updated bot color
-                author: track.info.author || 'Unknown Artist',
-                authorColor: '#696969',
-            });
-
+          const musicard = await Dynamic({
+            thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
+            backgroundColor: '#121212',  // Darker background for better contrast
+            progress: 10,
+            progressColor: '#ffcc00',  // Lighter progress color for readability
+            progressBarColor: '#dbd8d3', // Bot color for progress bar
+            name: track.info.title,
+            nameColor: '#dbd8d3', // Bot color for track name
+            author: track.info.author || 'Unknown Artist',
+            authorColor: '#a1a1a1', // Slightly lighter gray for author to stand out more
+        });
+        
             const cardPath = path.join(__dirname, 'musicard.png');
             fs.writeFileSync(cardPath, musicard);
 
