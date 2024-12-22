@@ -49,14 +49,14 @@ function initializePlayer(client) {
             // Music card creation
             const musicard = await Dynamic({
                 thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-                backgroundColor: '#121212',  // Darker background for better contrast
+                backgroundColor: '#121212',  // Keep a consistent background color
                 progress: 10,
-                progressColor: '#ffcc00',  // Lighter progress color for readability
+                progressColor: '#ffcc00',  // Consistent progress color
                 progressBarColor: '#dbd8d3', // Bot color for progress bar
                 name: track.info.title,
                 nameColor: '#dbd8d3', // Bot color for track name
                 author: track.info.author || 'Unknown Artist',
-                authorColor: '#a1a1a1', // Slightly lighter gray for author to stand out more
+                authorColor: '#a1a1a1', // Consistent author color
             });
 
             const cardPath = path.join(__dirname, 'musicard.png');
@@ -70,8 +70,8 @@ function initializePlayer(client) {
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
                 .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
-                .setColor('#dbd8d3') // Bot color for embed
-                .setDescription(``) // Remove description, only banner image is used
+                .setColor('#dbd8d3') // Consistent bot color for embed
+                .setDescription('') // No description, just the image
                 .setFooter({
                     text: `Requested by ${requester.username}`,
                     iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
