@@ -58,26 +58,27 @@ function initializePlayer(client) {
                 authorColor: '#696969',
             });
 
-            // Save the generated card to a file
             const cardPath = path.join(__dirname, 'musicard.png');
             fs.writeFileSync(cardPath, musicard);
 
-            // Prepare the attachment and embed
             const attachment = new AttachmentBuilder(cardPath, { name: 'musicard.png' });
             const embed = new EmbedBuilder()
                 .setAuthor({
                     name: 'Now Playing',
-                    iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif' // Replace with actual icon URL
+                    iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
-                .setDescription('🎶 **Controls:**\n 🔁 `Loop`, ❌ `Disable`, ⏭️ `Skip`, 📜 `Queue`, 🗑️ `Clear`\n ⏹️ `Stop`, ⏸️ `Pause`, ▶️ `Resume`, 🔊 `Vol +`, 🔉 `Vol -`')
+                .setDescription(`
+                    🎶 **Controls:**
+                    <:synclogo:1320415646370103376> \`Loop\`, <:disablelogo:1320412997218205696> \`Disable\`, <:skiplogo:1320414333523591178> \`Skip\`, <:queuelogo:1320413053187002428> \`Queue\`, <:clearlogo:1320413125626953729> \`Clear\`
+                    <:stoplogo:1320413021876654194> \`Stop\`, <:pauselogo:1320412748575670294> \`Pause\`, <:playlogo:1320412974644727880> \`Resume\`, <:volpluslogo:1320413395727417375> \`Vol +\`, <:volminuslogo:1320413413330915349> \`Vol -\`
+                    `)
+                    
                 .setImage('attachment://musicard.png')
                 .setColor('#FF7A00');
 
-            // Action rows for music controls
             const actionRow1 = createActionRow1(false);
             const actionRow2 = createActionRow2(false);
 
-            // Send the message and set up the collector
             const message = await channel.send({
                 embeds: [embed],
                 files: [attachment],
@@ -85,7 +86,7 @@ function initializePlayer(client) {
             });
             currentTrackMessageId = message.id;
 
-            if (collector) collector.stop(); // Stop any existing collectors
+            if (collector) collector.stop();
             collector = setupCollector(client, player, channel, message);
 
         } catch (error) {
@@ -142,7 +143,7 @@ function setupCollector(client, player, channel, message) {
         'stopTrack', 'pauseTrack', 'resumeTrack', 'volumeUp', 'volumeDown'
     ].includes(i.customId);
 
-    const collector = message.createMessageComponentCollector({ filter, time: 600000 }); // Set timeout if desired
+    const collector = message.createMessageComponentCollector({ filter, time: 600000 });
 
     collector.on('collect', async i => {
         await i.deferUpdate();
@@ -234,20 +235,6 @@ function adjustVolume(player, channel, amount) {
         sendEmbed(channel, `🔊 **Volume changed to ${newVolume}%!**`);
     }
 }
-function formatTrack(track) {
-    if (!track || typeof track !== 'string') return track;
-    
- 
-    const match = track.match(/\[(.*?) - (.*?)\]\((.*?)\)/);
-    if (match) {
-        const [, title, author, uri] = match;
-        return `[${title} - ${author}](${uri})`;
-    }
-    
-  
-    return track;
-}
-
 
 function toggleLoop(player, channel) {
     player.setLoop(player.loop === "track" ? "queue" : "track");
@@ -268,7 +255,6 @@ function showQueue(channel) {
     const nowPlaying = `🎵 **Now Playing:**\n${formatTrack(queueNames[0])}`;
     const queueChunks = [];
 
-    // Split the queue into chunks of 10 songs per embed
     for (let i = 1; i < queueNames.length; i += 10) {
         const chunk = queueNames.slice(i, i + 10)
             .map((song, index) => `${i + index}. ${formatTrack(song)}`)
@@ -276,12 +262,10 @@ function showQueue(channel) {
         queueChunks.push(chunk);
     }
 
-    // Send the "Now Playing" message first
     channel.send({
         embeds: [new EmbedBuilder().setColor(config.embedColor).setDescription(nowPlaying)]
     }).catch(console.error);
 
-    // Send each chunk as a separate embed
     queueChunks.forEach(async (chunk) => {
         const embed = new EmbedBuilder()
             .setColor(config.embedColor)
@@ -290,27 +274,36 @@ function showQueue(channel) {
     });
 }
 
-
 function createActionRow1(disabled) {
     return new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder().setCustomId("loopToggle").setEmoji('🔁').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("disableLoop").setEmoji('❌').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("skipTrack").setEmoji('⏭️').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("showQueue").setEmoji('📜').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("clearQueue").setEmoji('🗑️').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
+            new ButtonBuilder().setCustomId("loopToggle").setEmoji('<:synclogo:1320415646370103376>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("disableLoop").setEmoji('<:disablelogo:1320412997218205696>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("skipTrack").setEmoji('<:skiplogo:1320414333523591178>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("showQueue").setEmoji('<:queuelogo:1320413053187002428>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("clearQueue").setEmoji('<:clearlogo:1320413125626953729>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
         );
 }
 
 function createActionRow2(disabled) {
     return new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder().setCustomId("stopTrack").setEmoji('⏹️').setStyle(ButtonStyle.Danger).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("pauseTrack").setEmoji('⏸️').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("resumeTrack").setEmoji('▶️').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("volumeUp").setEmoji('🔊').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
-            new ButtonBuilder().setCustomId("volumeDown").setEmoji('🔉').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
+            new ButtonBuilder().setCustomId("stopTrack").setEmoji('<:stoplogo:1320413021876654194>').setStyle(ButtonStyle.Danger).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("pauseTrack").setEmoji('<:pauselogo:1320412748575670294>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("resumeTrack").setEmoji('<:playlogo:1320412974644727880>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("volumeUp").setEmoji('<:volpluslogo:1320413395727417375>').setStyle(ButtonStyle.Secondary).setDisabled(disabled),
+            new ButtonBuilder().setCustomId("volumeDown").setEmoji('<:volminuslogo:1320413413330915349>').setStyle(ButtonStyle.Secondary).setDisabled(disabled)
         );
+}
+
+function formatTrack(track) {
+    if (!track || typeof track !== 'string') return track;
+    const match = track.match(/\[(.*?) - (.*?)\]\((.*?)\)/);
+    if (match) {
+        const [, title, author, uri] = match;
+        return `[${title} - ${author}](${uri})`;
+    }
+    return track;
 }
 
 module.exports = { initializePlayer };
