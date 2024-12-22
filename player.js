@@ -74,7 +74,7 @@ function initializePlayer(client) {
                     name: 'Now Playing',
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
-                .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
+                .setImage('https://cdn.discordapp.com/attachments/1284095258044534859/1320461296562475008/player_banner.png?ex=6769aeea&is=67685d6a&hm=f4664ad2100dea741b2f5b73f5238acc1d997492e1da8939c18da6c4dd2fbebb&')
                 .setColor('#dbd8d3')
                 .setDescription('')
                 .setFooter({
