@@ -46,30 +46,32 @@ function initializePlayer(client) {
         const requester = requesters.get(trackUri);
 
         try {
+            // Music card creation
             const musicard = await Dynamic({
                 thumbnailImage: track.info.thumbnail || 'https://example.com/default_thumbnail.png',
-                backgroundColor: '#121212', 
+                backgroundColor: '#121212',  // Darker background for better contrast
                 progress: 10,
-                progressColor: '#ffcc00',  
-                progressBarColor: '#dbd8d3', 
+                progressColor: '#ffcc00',  // Lighter progress color for readability
+                progressBarColor: '#dbd8d3', // Bot color for progress bar
                 name: track.info.title,
-                nameColor: '#dbd8d3', 
+                nameColor: '#dbd8d3', // Bot color for track name
                 author: track.info.author || 'Unknown Artist',
-                authorColor: '#a1a1a1', 
+                authorColor: '#a1a1a1', // Slightly lighter gray for author to stand out more
             });
 
             const cardPath = path.join(__dirname, 'musicard.png');
             fs.writeFileSync(cardPath, musicard);
 
             const attachment = new AttachmentBuilder(cardPath, { name: 'musicard.png' });
+
             const embed = new EmbedBuilder()
                 .setAuthor({
                     name: 'Now Playing',
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
                 .setImage('https://cdn.discordapp.com/attachments/1284914027289641143/1320448552635207701/player_banner.png?ex=6769a30b&is=6768518b&hm=3053db47b480fac7d3cab0ff2b8744bb2af236d772ee29fddd1cae21d6f5a32d')
-                .setColor('#dbd8d3') 
-                .setDescription(``) 
+                .setColor('#dbd8d3') // Bot color for embed
+                .setDescription(``) // Remove description, only banner image is used
                 .setFooter({
                     text: `Requested by ${requester.username}`,
                     iconURL: requester.avatarURL || 'https://example.com/default_avatar.png',
@@ -90,6 +92,8 @@ function initializePlayer(client) {
 
         } catch (error) {
             console.error("Error creating or sending music card:", error.message);
+
+            // Send an error embed to the channel
             const errorEmbed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setDescription("⚠️ **Unable to load track card. Continuing playback...**");
