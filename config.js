@@ -23,7 +23,7 @@ module.exports = {
           host: "lava.inzeworld.com",
           port: 3128,
           password: "saher.inzeworld.com",
-          reconnectTimeout: 2036,
+          reconnectTimeout: 10000,
           reconnectTries: Infinity,
           secure: false
       },
