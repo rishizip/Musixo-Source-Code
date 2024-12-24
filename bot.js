@@ -1,3 +1,5 @@
+
+
 const { Client, GatewayIntentBits } = require("discord.js");
 const config = require("./config.js");
 const fs = require("fs");
@@ -31,40 +33,26 @@ fs.readdir("./events", (_err, files) => {
   });
 });
 
+
 client.commands = [];
-
-// Enhanced Command Loading Logic
 fs.readdir(config.commandsDir, (err, files) => {
-  if (err) {
-    console.error(`Error reading commands directory: ${err.message}`);
-    throw err;
-  }
-
-  files.forEach((f) => {
-    if (f.endsWith(".js")) {
-      try {
-        // Attempt to load the command file
+  if (err) throw err;
+  files.forEach(async (f) => {
+    try {
+      if (f.endsWith(".js")) {
         let props = require(`${config.commandsDir}/${f}`);
-
-        // Validate required properties
-        if (!props.name || !props.run) {
-          throw new Error(`Command file ${f} is missing "name" or "run" property.`);
-        }
-
-        // Push valid commands to client.commands
         client.commands.push({
           name: props.name,
-          description: props.description || "No description provided.",
-          options: props.options || [],
+          description: props.description,
+          options: props.options,
         });
-
-        console.log(`✔ Loaded command: ${props.name}`);
-      } catch (err) {
-        console.error(`❌ Failed to load command ${f}: ${err.message}`);
       }
+    } catch (err) {
+      console.log(err);
     }
   });
 });
+
 
 client.on("raw", (d) => {
     const { GatewayDispatchEvents } = require("discord.js");

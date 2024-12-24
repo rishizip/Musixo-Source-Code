@@ -68,11 +68,9 @@ function initializePlayer(client) {
                     iconURL: 'https://cdn.discordapp.com/emojis/838704777436200981.gif'
                 })
                 .setDescription(`
-🎶 **Controls:**
-<:synclogo:1320500087084028055> \`Loop\` ╎ <:disablelogo:1320500104137936980> \`Disable\` ╎ <:skiplogo:1320500281578094703> \`Skip\` ╎ <:queuelogo:1320500144952709130> \`Queue\` ╎ <:clearlogo:1320500163047067760> \`Clear\`
-<:stoplogo:1320500126170480732> \`Stop\` ╎ <:pauselogo:1320500055102455848> \`Pause\` ╎ <:playlogo:1320500071908773898> \`Resume\` ╎ <:volpluslogo:1320500195951247360> \`Vol +\` ╎ <:volminuslogo:1320500256407949312> \`Vol -\`
-`)
-
+                    <:synclogo:1320500087084028055> \`Loop\` ╎ <:disablelogo:1320500104137936980> \`Disable\` ╎ <:skiplogo:1320500281578094703> \`Skip\` ╎ <:queuelogo:1320500144952709130> \`Queue\` ╎ <:clearlogo:1320500163047067760> \`Clear\`
+                    <:stoplogo:1320500126170480732> \`Stop\` ╎ <:pauselogo:1320500055102455848> \`Pause\` ╎ <:playlogo:1320500071908773898> \`Resume\` ╎ <:volpluslogo:1320500195951247360> \`Vol +\` ╎ <:volminuslogo:1320500256407949312> \`Vol -\`
+                    `)
                 .setImage('attachment://musicard.png')
                 .setColor('#FF7A00');
 
@@ -236,6 +234,18 @@ function adjustVolume(player, channel, amount) {
     }
 }
 
+function formatTrack(track) {
+    if (!track || typeof track !== 'string') return track;
+    
+    const match = track.match(/\[(.*?) - (.*?)\]\((.*?)\)/);
+    if (match) {
+        const [, title, author, uri] = match;
+        return `[${title} - ${author}](${uri})`;
+    }
+    
+    return track;
+}
+
 function toggleLoop(player, channel) {
     player.setLoop(player.loop === "track" ? "queue" : "track");
     sendEmbed(channel, player.loop === "track" ? "🔁 **Track loop is activated!**" : "🔁 **Queue loop is activated!**");
@@ -270,7 +280,7 @@ function showQueue(channel) {
         const embed = new EmbedBuilder()
             .setColor(config.embedColor)
             .setDescription(`📜 **Queue:**\n${chunk}`);
-        await channel.send({ embeds: [embed] }).catch(console.error);
+        await channel.send({ embeds: [embed] });
     });
 }
 
@@ -296,4 +306,4 @@ function createActionRow2(disabled) {
         );
 }
 
-module.exports = initializePlayer;
+module.exports = { initializePlayer };
