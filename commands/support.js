@@ -1,87 +1,121 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 
 module.exports = {
-  name: "support",
-  description: "Access the support server and other resources",
+  name: "info",
+  description: "Displays bot and developer information.",
   permissions: "0x0000000000000800",
   options: [],
   run: async (client, interaction) => {
     try {
-      const supportServerLink = "https://dsc.gg/zipify";
-      const githubLink = "https://github.com/rishizip";
-      const gunslolLink = "https://guns.lol/rishizip";
-      const youtubeLink = "https://www.youtube.com/@rishizip";
-      const websiteLink = "https://rishizip.wixsite.com/musixo";
-      const emailAddress = "musixodc@gmail.com";
+      const botName = client.user.username;
+      const botAvatar = client.user.displayAvatarURL();
 
-      const embed = new EmbedBuilder()
-        .setColor('#dbd8d3')
-        .setAuthor({
-          name: "Support Menu",
-          iconURL: "https://cdn.discordapp.com/attachments/1284914027289641143/1318913893677924352/support_logo.png",
+      // Function for current date and time
+      const getTime = () => {
+        const now = new Date();
+        return `Today at ${now.getUTCHours()}:${now.getUTCMinutes().toString().padStart(2, '0')}`;
+      };
+
+      // Info about the bot and developer
+      const botInfo = `**Musixo** is a music bot for Discord. It supports platforms like YouTube, Spotify, and SoundCloud. It offers playback features, playlists, and more. However, due to limited resources, we currently do not support the 24/7 feature.`;
+      const botBanner = "https://cdn.discordapp.com/attachments/1284095777135923252/1318868447022809140/musixo_banner_v2.png";
+      const developerInfo = `**The bot is created and developed by [Rishi](https://guns.lol/rishizip).**`;
+      const developerBanner = "https://cdn.discordapp.com/attachments/1284095258044534859/1318901408954585191/MUSIXO_-_DEV_Banner.png";
+
+      // Dropdown Menu
+      const dropdown = new StringSelectMenuBuilder()
+        .setCustomId('info-menu')
+        .setPlaceholder('Choose a category')
+        .addOptions([
+          {
+            label: 'About Bot',
+            description: 'Learn more about Musixo.',
+            value: 'about_bot',
+            emoji: '<:muxiov2modified:1317762589647699969>',
+          },
+          {
+            label: 'About Developer',
+            description: 'Information about the developer.',
+            value: 'about_developer',
+            emoji: '<:developerlogo:1317761650014683166>',
+          },
+          {
+            label: 'Back to Main Menu',
+            description: 'Return to the main menu.',
+            value: 'main_menu',
+            emoji: '<:backlogo:1317775401254260746>',
+          },
+        ]);
+
+      const row = new ActionRowBuilder().addComponents(dropdown);
+
+      // Initial Embed
+      const mainEmbed = new EmbedBuilder()
+        .setColor('#dbd8d3') // Updated embed color
+        .setAuthor({ 
+          name: 'About Me',
+          iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317864810549084190/bot_logo.png'
         })
-        .setDescription(
-          `Need help or want to explore more? Use the buttons below to access our support server, resources, and platforms.\n\n📧 **Email:** ${emailAddress}`
-        )
-        .setImage(
-          'https://cdn.discordapp.com/attachments/1285468038610686003/1321427850779295834/Musixo_Website_Banner.png'
-        )
-        .setTimestamp();
+        .setThumbnail(botAvatar)
+        .setImage(botBanner)
+        .setDescription('<:menulogo:1317057173330858034> Choose a category from the dropdown menu below to get more information about the bot.')
+        .setFooter({ text: getTime() });
 
-      const row1 = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setLabel("Support Server")
-            .setStyle(ButtonStyle.Link)
-            .setURL(supportServerLink)
-            .setEmoji('<:discord:1317043530933211166>'),
-          new ButtonBuilder()
-            .setLabel("GitHub")
-            .setStyle(ButtonStyle.Link)
-            .setURL(githubLink)
-            .setEmoji('<:github:1318917991131385887>')
-        );
-
-      const row2 = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setLabel("Guns LOL")
-            .setStyle(ButtonStyle.Link)
-            .setURL(gunslolLink)
-            .setEmoji('<:gunslol:1318913278826516532>'),
-          new ButtonBuilder()
-            .setLabel("YouTube")
-            .setStyle(ButtonStyle.Link)
-            .setURL(youtubeLink)
-            .setEmoji('<:Youtube:1317004967550255215>')
-        );
-
-      const row3 = new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setLabel("Website")
-            .setStyle(ButtonStyle.Link)
-            .setURL(websiteLink)
-            .setEmoji('<:dashboardlogo:1321181081298534420>')
-        );
-
-      return interaction.reply({ embeds: [embed], components: [row1, row2, row3] });
-    } catch (e) {
-      console.error(e);
-
-      const errorEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
-        .setTitle("Error")
-        .setDescription(
-          "An error occurred while displaying the support menu. Please try again later.\n\n" +
-          `**Details:**\n\`\`\`${e.message}\`\`\``
-        )
-        .setTimestamp();
-
-      return interaction.reply({
-        embeds: [errorEmbed],
-        ephemeral: true,
+      // Acknowledge the interaction and send the initial reply
+      await interaction.reply({
+        embeds: [mainEmbed],
+        components: [row],
+        ephemeral: false,
       });
+
+      // Collector for interactions
+      const filter = (i) => i.customId === 'info-menu' && i.user.id === interaction.user.id;
+      const collector = interaction.channel.createMessageComponentCollector({ filter, time: 120000 });
+
+      collector.on('collect', async (i) => {
+        let categoryEmbed;
+
+        if (i.values[0] === 'about_bot') {
+          categoryEmbed = new EmbedBuilder()
+            .setColor('#dbd8d3') // Updated embed color
+            .setAuthor({ 
+              name: 'Bot Info', 
+              iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317791029075640360/info_logo.png' 
+            })
+            .setDescription(botInfo)
+            .setThumbnail(botAvatar)
+            .setImage(botBanner)
+            .setFooter({ text: getTime() });
+        } else if (i.values[0] === 'about_developer') {
+          categoryEmbed = new EmbedBuilder()
+            .setColor('#dbd8d3') // Updated embed color
+            .setAuthor({ 
+              name: 'Developer Info', 
+              iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317863169443500202/developer_logo.png' 
+            })
+            .setDescription(developerInfo)
+            .setThumbnail(botAvatar)
+            .setImage(developerBanner) // Added developer banner image
+            .setFooter({ text: getTime() });
+        } else if (i.values[0] === 'main_menu') {
+          categoryEmbed = mainEmbed;
+        }
+
+        await i.update({ embeds: [categoryEmbed], components: [row] });
+      });
+
+      collector.on('end', async () => {
+        try {
+          const disabledDropdown = StringSelectMenuBuilder.from(dropdown).setDisabled(true); // Clone and disable
+          const disabledRow = new ActionRowBuilder().addComponents(disabledDropdown);
+          await interaction.editReply({ components: [disabledRow] });
+        } catch (error) {
+          console.error('Error ending interaction:', error);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error in /info command:', error);
     }
   },
 };
