@@ -11,6 +11,7 @@ module.exports = {
       const githubLink = "https://github.com/rishizip";
       const gunslolLink = "https://guns.lol/rishizip";
       const youtubeLink = "https://www.youtube.com/@rishizip";
+      const websiteLink = "https://rishizip.wixsite.com/musixo";
 
       const embed = new EmbedBuilder()
         .setColor('#dbd8d3')
@@ -23,7 +24,8 @@ module.exports = {
           `<:discord:1317043530933211166> - [Support Server](${supportServerLink})\n` +
           `<:github:1318917991131385887> - [GitHub](${githubLink})\n` +
           `<:gunslol:1318913278826516532> - [Guns LOL](${gunslolLink})\n` +
-          `<:Youtube:1317004967550255215> - [YouTube](${youtubeLink})`
+          `<:Youtube:1317004967550255215> - [YouTube](${youtubeLink})\n` +
+          `<:dashboardlogo:1321181081298534420> - [Website](${websiteLink})`
         )
         .setImage(
           'https://cdn.discordapp.com/attachments/1284095258044534859/1318915138065268798/musixo_banner_v2.png?ex=67640ef1&is=6762bd71&hm=4dd7d7b079a0e32d3bea3afe9b824f7308dabe7d25c931d3dfe080f6264b0eeb&'
