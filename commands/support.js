@@ -12,7 +12,7 @@ module.exports = {
       const gunslolLink = "https://guns.lol/rishizip";
       const youtubeLink = "https://www.youtube.com/@rishizip";
       const websiteLink = "https://rishizip.wixsite.com/musixo";
-      const gmailLink = "mailto:musixodc@gmail.com";
+      const emailAddress = "musixodc@gmail.com";
 
       const embed = new EmbedBuilder()
         .setColor('#dbd8d3')
@@ -21,7 +21,7 @@ module.exports = {
           iconURL: "https://cdn.discordapp.com/attachments/1284914027289641143/1318913893677924352/support_logo.png",
         })
         .setDescription(
-          "Need help or want to explore more? Use the buttons below to access our support server, resources, and platforms."
+          `Need help or want to explore more? Use the buttons below to access our support server, resources, and platforms.\n\n📧 **Email:** ${emailAddress}`
         )
         .setImage(
           'https://cdn.discordapp.com/attachments/1285468038610686003/1321427850779295834/Musixo_Website_Banner.png'
@@ -62,12 +62,7 @@ module.exports = {
             .setLabel("Website")
             .setStyle(ButtonStyle.Link)
             .setURL(websiteLink)
-            .setEmoji('<:dashboardlogo:1321181081298534420>'),
-          new ButtonBuilder()
-            .setLabel("Gmail")
-            .setStyle(ButtonStyle.Link)
-            .setURL(gmailLink)
-            .setEmoji('<:gmaillogo:1321433432269520957>')
+            .setEmoji('<:dashboardlogo:1321181081298534420>')
         );
 
       return interaction.reply({ embeds: [embed], components: [row1, row2, row3] });
