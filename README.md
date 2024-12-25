@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="https://github.com/rishizip/animations/blob/67f658d4f4528d33e8fceb6f4344640366b94a9a/musixo%20banner%20v2.png" alt="MUSIXO" width="800">
+    <img src="https://github.com/rishizip/animations/blob/da51a4099de14efeb88abeef4db420fddf217fe3/Musixo%20Website%20Banner.png" alt="MUSIXO" width="800">
 </p>
 
 
