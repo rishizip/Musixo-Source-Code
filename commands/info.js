@@ -1,5 +1,4 @@
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
-const config = require("../config.js");
 
 module.exports = {
   name: "info",
@@ -19,7 +18,7 @@ module.exports = {
 
       // Info about the bot and developer
       const botInfo = `**Musixo** is a music bot for Discord. It supports platforms like YouTube, Spotify, and SoundCloud. It offers playback features, playlists, and more. However, due to limited resources, we currently do not support the 24/7 feature.`;
-      const botBanner = "https://cdn.discordapp.com/attachments/1284095777135923252/1318868447022809140/musixo_banner_v2.png";
+      const botBanner = "https://cdn.discordapp.com/attachments/1285468038610686003/1321427850779295834/Musixo_Website_Banner.png?ex=676d3316&is=676be196&hm=5a816fd79764b86892d3b882e57d499c60b9ac4dbc4620ffc1ef315e77c4357d&";
       const developerInfo = `**The bot is created and developed by [Rishi](https://guns.lol/rishizip).**`;
       const developerBanner = "https://cdn.discordapp.com/attachments/1284095258044534859/1318901408954585191/MUSIXO_-_DEV_Banner.png";
 
@@ -52,13 +51,13 @@ module.exports = {
 
       // Initial Embed
       const mainEmbed = new EmbedBuilder()
-        .setColor(config.embedColor)
+        .setColor('#dbd8d3') // Updated embed color
         .setAuthor({ 
           name: 'About Me',
           iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317864810549084190/bot_logo.png'
         })
         .setThumbnail(botAvatar)
-        .setImage(botBanner)
+        .setImage(botBanner) // Updated bot banner image
         .setDescription('<:menulogo:1317057173330858034> Choose a category from the dropdown menu below to get more information about the bot.')
         .setFooter({ text: getTime() });
 
@@ -78,18 +77,18 @@ module.exports = {
 
         if (i.values[0] === 'about_bot') {
           categoryEmbed = new EmbedBuilder()
-            .setColor(config.embedColor)
+            .setColor('#dbd8d3') // Updated embed color
             .setAuthor({ 
               name: 'Bot Info', 
               iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317791029075640360/info_logo.png' 
             })
             .setDescription(botInfo)
             .setThumbnail(botAvatar)
-            .setImage(botBanner)
+            .setImage(botBanner) // Updated bot banner image for "Bot Info"
             .setFooter({ text: getTime() });
         } else if (i.values[0] === 'about_developer') {
           categoryEmbed = new EmbedBuilder()
-            .setColor(config.embedColor)
+            .setColor('#dbd8d3') // Updated embed color
             .setAuthor({ 
               name: 'Developer Info', 
               iconURL: 'https://cdn.discordapp.com/attachments/1284095258044534859/1317863169443500202/developer_logo.png' 
