@@ -68,8 +68,18 @@ module.exports = {
       return interaction.reply({ embeds: [embed], components: [row1, row2, row3] });
     } catch (e) {
       console.error(e);
+
+      const errorEmbed = new EmbedBuilder()
+        .setColor('#FF0000')
+        .setTitle("Error")
+        .setDescription(
+          "An error occurred while displaying the support menu. Please try again later.\n\n" +
+          `**Details:**\n\`\`\`${e.message}\`\`\``
+        )
+        .setTimestamp();
+
       return interaction.reply({
-        content: "An error occurred while displaying the support menu.",
+        embeds: [errorEmbed],
         ephemeral: true,
       });
     }
