@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-    <a href="https://guns.lol/rishizip"><img src="https://img.shields.io/badge/Owner-Rishizip-lightgrey?logo=github&logoColor=white"></a>
+    <a href="https://github.com/rishizip"><img src="https://img.shields.io/badge/Owner-Rishizip-lightgrey?logo=github&logoColor=white"></a>
     <a href="https://dsc.gg/zipify"><img src="https://img.shields.io/badge/Support-Server-blue?logo=discord&logoColor=white"></a>
     <a href="https://discord.com/oauth2/authorize?client_id=1316795820573589614"><img src="https://img.shields.io/badge/Invite-MUSIXO-blue?logo=discord&logoColor=white"></a>
 </p>
